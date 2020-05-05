@@ -43,7 +43,7 @@ public class VisitController {
     }
 
     @GetMapping("/visits/{id}")
-    public List<VisitDto> getPatientVisits(@PathVariable("id") Long id) {
+    public List<VisitDto> getPatientVisits(@PathVariable("id") Long patientId) {
         return null;
     }
 }

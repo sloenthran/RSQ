@@ -29,5 +29,6 @@ public class Doctor {
 
     @NotNull
     @Column(name = "specialization")
-    private String specialization;
+    @Enumerated(EnumType.STRING)
+    private DoctorSpecialization specialization;
 }

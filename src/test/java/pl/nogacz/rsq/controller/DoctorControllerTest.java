@@ -58,7 +58,7 @@ public class DoctorControllerTest {
         assertEquals(doctorDto.getSpecialization(), DoctorSpecialization.VET);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void getDoctorException() throws Exception {
         //Given
@@ -69,7 +69,9 @@ public class DoctorControllerTest {
 
         //When
         ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor/1", HttpMethod.GET, httpEntity, String.class);
-        new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -133,7 +135,7 @@ public class DoctorControllerTest {
         assertEquals(doctorDto.getSpecialization(), DoctorSpecialization.DENTIST);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void editDoctorException() throws Exception {
         //Given
@@ -150,12 +152,50 @@ public class DoctorControllerTest {
         HttpEntity httpEntity = new HttpEntity(editDoctorDto, headers);
 
         //When
-
         ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor", HttpMethod.PUT, httpEntity, String.class);
-        new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void deleteDoctor() {
+        //Given
+        Doctor doctor = Doctor.builder()
+                .name("Alfred")
+                .surname("Dratewka")
+                .specialization(DoctorSpecialization.VET)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        doctorRepository.save(doctor);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor/1", HttpMethod.DELETE, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void deleteDoctorException() {
+        //Given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor/1", HttpMethod.DELETE, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 }

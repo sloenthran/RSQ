@@ -27,4 +27,10 @@ public class DoctorService {
 
         return doctorRepository.save(doctor);
     }
+
+    public void deleteDoctor(final Long id) throws DoctorNotFoundException {
+        getDoctor(id);
+
+        doctorRepository.deleteById(id);
+    }
 }

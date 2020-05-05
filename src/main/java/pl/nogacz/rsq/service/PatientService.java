@@ -32,4 +32,10 @@ public class PatientService {
 
         return patientRepository.save(patient);
     }
+
+    public void deletePatient(final Long id) throws PatientNotFoundException {
+        getPatient(id);
+
+        patientRepository.deleteById(id);
+    }
 }

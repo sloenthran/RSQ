@@ -26,4 +26,10 @@ public class PatientService {
     public Patient getPatient(final Long id) throws PatientNotFoundException {
         return patientRepository.findById(id).orElseThrow(PatientNotFoundException::new);
     }
+
+    public Patient editPatient(final Patient patient) throws PatientNotFoundException {
+        getPatient(patient.getId());
+
+        return patientRepository.save(patient);
+    }
 }

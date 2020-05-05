@@ -32,4 +32,13 @@ public class PatientMapper {
                 .map(this::mapPatientToPatientDto)
                 .collect(Collectors.toList());
     }
+
+    public Patient mapPatientDtoToPatient(final PatientDto patientDto) {
+        return Patient.builder()
+                .id(patientDto.getId())
+                .name(patientDto.getName())
+                .surname(patientDto.getSurname())
+                .address(patientDto.getAddress())
+                .build();
+    }
 }

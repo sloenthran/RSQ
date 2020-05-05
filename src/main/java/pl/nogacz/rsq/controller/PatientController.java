@@ -47,8 +47,12 @@ public class PatientController {
     }
 
     @PutMapping("/patient")
-    public PatientDto editPatient(@RequestBody PatientDto patientDto) {
-        return null;
+    public PatientDto editPatient(@RequestBody PatientDto patientDto) throws PatientNotFoundException {
+        Patient patient = service.editPatient(
+                mapper.mapPatientDtoToPatient(patientDto)
+        );
+
+        return mapper.mapPatientToPatientDto(patient);
     }
 
     @DeleteMapping("/patient/{id}")

@@ -23,4 +23,13 @@ public class DoctorMapper {
                 .specialization(doctor.getSpecialization())
                 .build();
     }
+
+    public Doctor mapDoctorDtoToDoctor(final DoctorDto doctorDto) {
+        return Doctor.builder()
+                .id(doctorDto.getId())
+                .name(doctorDto.getName())
+                .surname(doctorDto.getSurname())
+                .specialization(doctorDto.getSpecialization())
+                .build();
+    }
 }

@@ -14,7 +14,6 @@ import pl.nogacz.rsq.domain.Doctor;
 import pl.nogacz.rsq.domain.DoctorSpecialization;
 import pl.nogacz.rsq.dto.AddDoctorDto;
 import pl.nogacz.rsq.dto.DoctorDto;
-import pl.nogacz.rsq.exception.DoctorNotFoundException;
 import pl.nogacz.rsq.repository.DoctorRepository;
 
 import static org.junit.Assert.*;
@@ -32,7 +31,7 @@ public class DoctorControllerTest {
     private DoctorRepository doctorRepository;
 
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void getDoctor() throws Exception {
         //Given
         Doctor doctor = Doctor.builder()
@@ -60,7 +59,7 @@ public class DoctorControllerTest {
     }
 
     @Test(expected = Exception.class)
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void getDoctorException() throws Exception {
         //Given
         HttpHeaders headers = new HttpHeaders();
@@ -74,7 +73,7 @@ public class DoctorControllerTest {
     }
 
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void addDoctor() throws Exception {
         //Given
         AddDoctorDto addDoctorDto = AddDoctorDto.builder()
@@ -100,7 +99,60 @@ public class DoctorControllerTest {
     }
 
     @Test
-    public void editDoctor() {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void editDoctor() throws Exception {
+        //Given
+        Doctor doctor = Doctor.builder()
+                .name("Alfred")
+                .surname("Dratewka")
+                .specialization(DoctorSpecialization.VET)
+                .build();
+
+        DoctorDto editDoctorDto = DoctorDto.builder()
+                .id(1L)
+                .name("Alfred")
+                .surname("Zębacz")
+                .specialization(DoctorSpecialization.DENTIST)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(editDoctorDto, headers);
+
+        //When
+        doctorRepository.save(doctor);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor", HttpMethod.PUT, httpEntity, String.class);
+        DoctorDto doctorDto = new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
+
+        //Then
+        assertEquals(doctorDto.getId(), 1L, 0.0);
+        assertEquals(doctorDto.getName(), "Alfred");
+        assertEquals(doctorDto.getSurname(), "Zębacz");
+        assertEquals(doctorDto.getSpecialization(), DoctorSpecialization.DENTIST);
+    }
+
+    @Test(expected = Exception.class)
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void editDoctorException() throws Exception {
+        //Given
+        DoctorDto editDoctorDto = DoctorDto.builder()
+                .id(1L)
+                .name("Alfred")
+                .surname("Zębacz")
+                .specialization(DoctorSpecialization.DENTIST)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(editDoctorDto, headers);
+
+        //When
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor", HttpMethod.PUT, httpEntity, String.class);
+        new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
     }
 
     @Test

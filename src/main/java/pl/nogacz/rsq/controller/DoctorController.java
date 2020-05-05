@@ -38,8 +38,12 @@ public class DoctorController {
     }
 
     @PutMapping("/doctor")
-    public DoctorDto editDoctor(@RequestBody DoctorDto doctorDto) {
-        return null;
+    public DoctorDto editDoctor(@RequestBody DoctorDto doctorDto) throws DoctorNotFoundException {
+        Doctor doctor = service.editDoctor(
+                mapper.mapDoctorDtoToDoctor(doctorDto)
+        );
+
+        return mapper.mapDoctorToDoctorDto(doctor);
     }
 
     @DeleteMapping("/doctor/{id}")

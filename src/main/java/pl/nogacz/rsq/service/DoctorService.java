@@ -21,4 +21,10 @@ public class DoctorService {
     public Doctor addDoctor(final Doctor doctor) {
         return doctorRepository.save(doctor);
     }
+
+    public Doctor editDoctor(final Doctor doctor) throws DoctorNotFoundException {
+        getDoctor(doctor.getId());
+
+        return doctorRepository.save(doctor);
+    }
 }

@@ -10,9 +10,10 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import pl.nogacz.rsq.domain.Patient;
 import pl.nogacz.rsq.dto.AddPatientDto;
-import pl.nogacz.rsq.dto.DoctorDto;
 import pl.nogacz.rsq.dto.PatientDto;
+import pl.nogacz.rsq.repository.PatientRepository;
 
 import static org.junit.Assert.*;
 
@@ -25,9 +26,52 @@ public class PatientControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private PatientRepository patientRepository;
+
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-    public void getPatient() {
+    public void getPatient() throws Exception {
+        //Given
+        Patient patient = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        patientRepository.save(patient);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/patient/1", HttpMethod.GET, httpEntity, String.class);
+        PatientDto patientDto = new ObjectMapper().readValue(responseEntity.getBody(), PatientDto.class);
+
+        //Then
+        assertEquals(patientDto.getId(), 1L, 0.0);
+        assertEquals(patientDto.getName(), "Radosław");
+        assertEquals(patientDto.getSurname(), "Koparka");
+        assertEquals(patientDto.getAddress(), "Budowlana 1, 00-000 Zakopane");
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void getPatientException() throws Exception {
+        //Given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/patient/1", HttpMethod.GET, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
     @Test

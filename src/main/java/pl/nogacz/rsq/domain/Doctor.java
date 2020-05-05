@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,4 +33,13 @@ public class Doctor {
     @Column(name = "specialization")
     @Enumerated(EnumType.STRING)
     private DoctorSpecialization specialization;
+
+    @OneToMany(
+            targetEntity = Visit.class,
+            cascade = CascadeType.ALL,
+            mappedBy = "doctor",
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private List<Visit> visits = new ArrayList<>();
 }

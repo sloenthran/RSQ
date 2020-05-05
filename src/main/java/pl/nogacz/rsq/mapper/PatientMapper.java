@@ -5,6 +5,9 @@ import pl.nogacz.rsq.domain.Patient;
 import pl.nogacz.rsq.dto.AddPatientDto;
 import pl.nogacz.rsq.dto.PatientDto;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class PatientMapper {
     public Patient mapAddPatientDtoToPatient(final AddPatientDto patientDto) {
@@ -22,5 +25,11 @@ public class PatientMapper {
                 .surname(patient.getSurname())
                 .address(patient.getAddress())
                 .build();
+    }
+
+    public List<PatientDto> mapListPatientToListPatientDto(final List<Patient> patients) {
+        return patients.stream()
+                .map(this::mapPatientToPatientDto)
+                .collect(Collectors.toList());
     }
 }

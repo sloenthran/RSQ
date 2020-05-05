@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.nogacz.rsq.domain.Patient;
 import pl.nogacz.rsq.dto.AddPatientDto;
 import pl.nogacz.rsq.dto.PatientDto;
+import pl.nogacz.rsq.exception.PatientNotFoundException;
 import pl.nogacz.rsq.mapper.PatientMapper;
 import pl.nogacz.rsq.service.PatientService;
 
@@ -23,13 +24,17 @@ public class PatientController {
     private PatientService service;
 
     @GetMapping("/patient/{id}")
-    public PatientDto getPatient(@PathVariable("id") Long id) {
-        return null;
+    public PatientDto getPatient(@PathVariable("id") Long id) throws PatientNotFoundException {
+        return mapper.mapPatientToPatientDto(
+                service.getPatient(id)
+        );
     }
 
     @GetMapping("/patients")
     public List<PatientDto> getPatients() {
-        return null;
+        return mapper.mapListPatientToListPatientDto(
+                service.getPatients()
+        );
     }
 
     @PostMapping("/patient")

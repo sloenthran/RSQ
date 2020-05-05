@@ -15,6 +15,8 @@ import pl.nogacz.rsq.dto.AddPatientDto;
 import pl.nogacz.rsq.dto.PatientDto;
 import pl.nogacz.rsq.repository.PatientRepository;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -76,7 +78,41 @@ public class PatientControllerTest {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-    public void getPatients() {
+    public void getPatients() throws Exception {
+        //Given
+        Patient patientOne = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        Patient patientTwo = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        Patient patientThree = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        patientRepository.save(patientOne);
+        patientRepository.save(patientTwo);
+        patientRepository.save(patientThree);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/patients", HttpMethod.GET, httpEntity, String.class);
+        List<PatientDto> patientDto = new ObjectMapper().readValue(responseEntity.getBody(), List.class);
+
+        //Then
+        assertEquals(patientDto.size(), 3);
     }
 
     @Test

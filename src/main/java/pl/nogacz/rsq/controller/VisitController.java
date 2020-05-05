@@ -9,6 +9,7 @@ import pl.nogacz.rsq.dto.ChangeVisitTimeDto;
 import pl.nogacz.rsq.dto.VisitDto;
 import pl.nogacz.rsq.exception.DoctorNotFoundException;
 import pl.nogacz.rsq.exception.PatientNotFoundException;
+import pl.nogacz.rsq.exception.VisitNotFoundException;
 import pl.nogacz.rsq.mapper.VisitMapper;
 import pl.nogacz.rsq.service.VisitService;
 
@@ -35,8 +36,8 @@ public class VisitController {
     }
 
     @DeleteMapping("/visit/{id}")
-    public void deleteVisit(@PathVariable("id") Long id) {
-
+    public void deleteVisit(@PathVariable("id") Long id) throws VisitNotFoundException {
+        service.deleteVisit(id);
     }
 
     @PutMapping("/visit/time")

@@ -3,6 +3,7 @@ package pl.nogacz.rsq.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.nogacz.rsq.domain.Visit;
+import pl.nogacz.rsq.exception.VisitNotFoundException;
 import pl.nogacz.rsq.repository.VisitRepository;
 
 import javax.transaction.Transactional;
@@ -15,5 +16,10 @@ public class VisitService {
 
     public Visit addVisit(final Visit visit) {
         return visitRepository.save(visit);
+    }
+
+    public void deleteVisit(final Long id) throws VisitNotFoundException {
+        Visit visit = visitRepository.findById(id).orElseThrow(VisitNotFoundException::new);
+        visitRepository.delete(visit);
     }
 }

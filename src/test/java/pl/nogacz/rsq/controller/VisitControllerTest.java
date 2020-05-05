@@ -108,6 +108,9 @@ public class VisitControllerTest {
                 .date(LocalDateTime.now())
                 .build();
 
+        doctor.getVisits().add(visit);
+        patient.getVisits().add(visit);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

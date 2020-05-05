@@ -143,7 +143,60 @@ public class PatientControllerTest {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-    public void editPatient() {
+    public void editPatient() throws Exception {
+        //Given
+        Patient patient = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        PatientDto editPatient = PatientDto.builder()
+                .id(1L)
+                .name("Zdzisław")
+                .surname("Wiertarka")
+                .address("Głośna 1, 11-111 Sobótka")
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(editPatient, headers);
+
+        //When
+        patientRepository.save(patient);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/patient", HttpMethod.PUT, httpEntity, String.class);
+        PatientDto patientDto = new ObjectMapper().readValue(responseEntity.getBody(), PatientDto.class);
+
+        //Then
+        assertEquals(patientDto.getId(), 1L, 0.0);
+        assertEquals(patientDto.getName(), "Zdzisław");
+        assertEquals(patientDto.getSurname(), "Wiertarka");
+        assertEquals(patientDto.getAddress(), "Głośna 1, 11-111 Sobótka");
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void editPatientException() throws Exception {
+        //Given
+        PatientDto editPatient = PatientDto.builder()
+                .id(1L)
+                .name("Zdzisław")
+                .surname("Wiertarka")
+                .address("Głośna 1, 11-111 Sobótka")
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(editPatient, headers);
+
+        //When
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/patient", HttpMethod.PUT, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
     @Test

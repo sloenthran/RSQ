@@ -10,9 +10,11 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import pl.nogacz.rsq.domain.Doctor;
 import pl.nogacz.rsq.domain.DoctorSpecialization;
 import pl.nogacz.rsq.dto.AddDoctorDto;
 import pl.nogacz.rsq.dto.DoctorDto;
+import pl.nogacz.rsq.repository.DoctorRepository;
 
 import static org.junit.Assert.*;
 
@@ -25,8 +27,35 @@ public class DoctorControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private DoctorRepository doctorRepository;
+
     @Test
-    public void getDoctor() {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void getDoctor() throws Exception {
+        //Given
+        Doctor doctor = Doctor.builder()
+                .name("Alfred")
+                .surname("Dratewka")
+                .specialization(DoctorSpecialization.VET)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        //When
+        doctorRepository.save(doctor);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor/1", HttpMethod.GET, httpEntity, String.class);
+        DoctorDto doctorDto = new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
+
+        //Then
+        assertEquals(doctorDto.getId(), 1L, 0.0);
+        assertEquals(doctorDto.getName(), "Alfred");
+        assertEquals(doctorDto.getSurname(), "Dratewka");
+        assertEquals(doctorDto.getSpecialization(), DoctorSpecialization.VET);
     }
 
     @Test

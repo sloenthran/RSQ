@@ -201,6 +201,41 @@ public class PatientControllerTest {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-    public void deletePatient() {
+    public void deletePatient() throws Exception {
+        //Given
+        Patient patient = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        patientRepository.save(patient);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/patient/1", HttpMethod.DELETE, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void deletePatientException() throws Exception {
+        //Given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/patient/1", HttpMethod.DELETE, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 }

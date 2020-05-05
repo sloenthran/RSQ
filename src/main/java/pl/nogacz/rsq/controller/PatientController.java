@@ -8,6 +8,8 @@ import pl.nogacz.rsq.dto.PatientDto;
 import pl.nogacz.rsq.mapper.PatientMapper;
 import pl.nogacz.rsq.service.PatientService;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin("*")
 @AllArgsConstructor
@@ -21,6 +23,11 @@ public class PatientController {
 
     @GetMapping("/patient/{id}")
     public PatientDto getPatient(@PathVariable("id") Long id) {
+        return null;
+    }
+
+    @GetMapping("/patients")
+    public List<PatientDto> getPatients() {
         return null;
     }
 

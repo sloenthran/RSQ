@@ -9,5 +9,4 @@ public class RsqApplication {
     public static void main(String[] args) {
         SpringApplication.run(RsqApplication.class, args);
     }
-
 }

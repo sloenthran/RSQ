@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class VisitDto {
     private Long id;
-    private LocalDateTime time;
+    private LocalDateTime date;
     private VisitPlace place;
     private Long doctor;
     private Long patient;

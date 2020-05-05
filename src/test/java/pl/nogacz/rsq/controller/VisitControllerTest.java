@@ -1,6 +1,7 @@
 package pl.nogacz.rsq.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,13 +82,13 @@ public class VisitControllerTest {
 
         //When
         ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visit", HttpMethod.POST, httpEntity, String.class);
-        VisitDto responseDto = new ObjectMapper().readValue(responseEntity.getBody(), VisitDto.class);
+        VisitDto responseDto = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(responseEntity.getBody(), VisitDto.class);
 
         //Then
         assertEquals(responseDto.getId(), 1L, 0.0);
         assertEquals(responseDto.getDoctor(), 1L, 0.0);
         assertEquals(responseDto.getPatient(), 1L, 0.0);
-        assertEquals(responseDto.getTime(), date);
+        assertEquals(responseDto.getDate(), date);
         assertEquals(responseDto.getPlace(), VisitPlace.INSTITUTION);
     }
 

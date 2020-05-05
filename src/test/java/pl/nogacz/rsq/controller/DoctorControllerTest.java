@@ -39,13 +39,6 @@ public class DoctorControllerTest {
                 .specialization(DoctorSpecialization.VET)
                 .build();
 
-        DoctorDto expectedDto = DoctorDto.builder()
-                .id(1L)
-                .name("Alfred")
-                .surname("Dratewka")
-                .specialization(DoctorSpecialization.VET)
-                .build();
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -56,7 +49,10 @@ public class DoctorControllerTest {
         DoctorDto doctorDto = new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
 
         //Then
-        assertEquals(doctorDto, expectedDto);
+        assertEquals(doctorDto.getId(), 1L, 0.0);
+        assertEquals(doctorDto.getName(), "Alfred");
+        assertEquals(doctorDto.getSurname(), "Dratewka");
+        assertEquals(doctorDto.getSpecialization(), DoctorSpecialization.VET);
     }
 
     @Test

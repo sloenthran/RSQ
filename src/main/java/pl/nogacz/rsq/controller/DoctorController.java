@@ -3,6 +3,7 @@ package pl.nogacz.rsq.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import pl.nogacz.rsq.domain.Doctor;
 import pl.nogacz.rsq.dto.AddDoctorDto;
 import pl.nogacz.rsq.dto.DoctorDto;
 import pl.nogacz.rsq.mapper.DoctorMapper;
@@ -26,7 +27,11 @@ public class DoctorController {
 
     @PostMapping("/doctor")
     public DoctorDto addDoctor(@RequestBody AddDoctorDto doctorDto) {
-        return null;
+        Doctor doctor = service.addDoctor(
+                mapper.mapAddDoctorDtoToDoctor(doctorDto)
+        );
+
+        return mapper.mapDoctorToDoctorDto(doctor);
     }
 
     @PutMapping("/doctor")

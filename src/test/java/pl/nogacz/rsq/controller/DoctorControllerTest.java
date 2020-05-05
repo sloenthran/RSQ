@@ -14,6 +14,7 @@ import pl.nogacz.rsq.domain.Doctor;
 import pl.nogacz.rsq.domain.DoctorSpecialization;
 import pl.nogacz.rsq.dto.AddDoctorDto;
 import pl.nogacz.rsq.dto.DoctorDto;
+import pl.nogacz.rsq.exception.DoctorNotFoundException;
 import pl.nogacz.rsq.repository.DoctorRepository;
 
 import static org.junit.Assert.*;
@@ -43,10 +44,10 @@ public class DoctorControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        HttpEntity httpEntity = new HttpEntity(headers);
+
         //When
         doctorRepository.save(doctor);
-
-        HttpEntity httpEntity = new HttpEntity(headers);
 
         ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor/1", HttpMethod.GET, httpEntity, String.class);
         DoctorDto doctorDto = new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
@@ -56,6 +57,20 @@ public class DoctorControllerTest {
         assertEquals(doctorDto.getName(), "Alfred");
         assertEquals(doctorDto.getSurname(), "Dratewka");
         assertEquals(doctorDto.getSpecialization(), DoctorSpecialization.VET);
+    }
+
+    @Test(expected = Exception.class)
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    public void getDoctorException() throws Exception {
+        //Given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor/1", HttpMethod.GET, httpEntity, String.class);
+        new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
     }
 
     @Test
@@ -71,9 +86,9 @@ public class DoctorControllerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        //When
         HttpEntity httpEntity = new HttpEntity(addDoctorDto, headers);
 
+        //When
         ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/doctor", HttpMethod.POST, httpEntity, String.class);
         DoctorDto doctorDto = new ObjectMapper().readValue(responseEntity.getBody(), DoctorDto.class);
 

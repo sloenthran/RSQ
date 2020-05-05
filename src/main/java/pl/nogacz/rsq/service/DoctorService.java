@@ -3,6 +3,7 @@ package pl.nogacz.rsq.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.nogacz.rsq.domain.Doctor;
+import pl.nogacz.rsq.exception.DoctorNotFoundException;
 import pl.nogacz.rsq.repository.DoctorRepository;
 
 import javax.transaction.Transactional;
@@ -12,6 +13,10 @@ import javax.transaction.Transactional;
 @AllArgsConstructor
 public class DoctorService {
     private DoctorRepository doctorRepository;
+
+    public Doctor getDoctor(final Long id) throws DoctorNotFoundException {
+        return doctorRepository.findById(id).orElseThrow(DoctorNotFoundException::new);
+    }
 
     public Doctor addDoctor(final Doctor doctor) {
         return doctorRepository.save(doctor);

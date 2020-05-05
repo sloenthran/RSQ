@@ -11,10 +11,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import pl.nogacz.rsq.domain.Doctor;
-import pl.nogacz.rsq.domain.DoctorSpecialization;
-import pl.nogacz.rsq.domain.Patient;
-import pl.nogacz.rsq.domain.VisitPlace;
+import pl.nogacz.rsq.domain.*;
 import pl.nogacz.rsq.dto.AddVisitDto;
 import pl.nogacz.rsq.dto.VisitDto;
 import pl.nogacz.rsq.repository.DoctorRepository;
@@ -43,7 +40,10 @@ public class VisitControllerTest {
     @Autowired
     private VisitRepository visitRepository;
 
-    public void addDoctorAndPatient() {
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void addVisit() throws Exception {
+        //Given
         Doctor doctor = Doctor.builder()
                 .name("Alfred")
                 .surname("Dratewka")
@@ -55,16 +55,6 @@ public class VisitControllerTest {
                 .surname("Koparka")
                 .address("Budowlana 1, 00-000 Zakopane")
                 .build();
-
-        doctorRepository.save(doctor);
-        patientRepository.save(patient);
-    }
-
-    @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-    public void addVisit() throws Exception {
-        //Given
-        addDoctorAndPatient();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -81,6 +71,9 @@ public class VisitControllerTest {
         HttpEntity httpEntity = new HttpEntity(visitDto, headers);
 
         //When
+        doctorRepository.save(doctor);
+        patientRepository.save(patient);
+
         ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visit", HttpMethod.POST, httpEntity, String.class);
         VisitDto responseDto = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(responseEntity.getBody(), VisitDto.class);
 
@@ -95,6 +88,57 @@ public class VisitControllerTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void deleteVisit() {
+        //Given
+        Doctor doctor = Doctor.builder()
+                .name("Alfred")
+                .surname("Dratewka")
+                .specialization(DoctorSpecialization.PSYCHOLOGIST)
+                .build();
+
+        Patient patient = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        Visit visit = Visit.builder()
+                .doctor(doctor)
+                .patient(patient)
+                .place(VisitPlace.INSTITUTION)
+                .date(LocalDateTime.now())
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        doctorRepository.save(doctor);
+        patientRepository.save(patient);
+        visitRepository.save(visit);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visit/1", HttpMethod.DELETE, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void deleteVisitException() {
+        //Given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visit/1", HttpMethod.DELETE, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
     @Test

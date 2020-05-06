@@ -20,6 +20,7 @@ import pl.nogacz.rsq.repository.PatientRepository;
 import pl.nogacz.rsq.repository.VisitRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -219,7 +220,65 @@ public class VisitControllerTest {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-    public void getVisits() {
+    public void getVisits() throws Exception {
+        //Given
+        Doctor doctor = Doctor.builder()
+                .name("Alfred")
+                .surname("Dratewka")
+                .specialization(DoctorSpecialization.PSYCHOLOGIST)
+                .build();
+
+        Patient patient = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        Visit visitOne = Visit.builder()
+                .doctor(doctor)
+                .patient(patient)
+                .place(VisitPlace.INSTITUTION)
+                .date(LocalDateTime.now())
+                .build();
+
+        Visit visitTwo = Visit.builder()
+                .doctor(doctor)
+                .patient(patient)
+                .place(VisitPlace.INSTITUTION)
+                .date(LocalDateTime.now())
+                .build();
+
+        Visit visitThree = Visit.builder()
+                .doctor(doctor)
+                .patient(patient)
+                .place(VisitPlace.INSTITUTION)
+                .date(LocalDateTime.now())
+                .build();
+
+        doctor.getVisits().add(visitOne);
+        doctor.getVisits().add(visitTwo);
+        doctor.getVisits().add(visitThree);
+        patient.getVisits().add(visitOne);
+        patient.getVisits().add(visitTwo);
+        patient.getVisits().add(visitThree);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+
+        //When
+        doctorRepository.save(doctor);
+        patientRepository.save(patient);
+        visitRepository.save(visitOne);
+        visitRepository.save(visitTwo);
+        visitRepository.save(visitThree);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visits", HttpMethod.GET, httpEntity, String.class);
+        List<VisitDto> visits = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(responseEntity.getBody(), List.class);
+
+        //Then
+        assertEquals(visits.size(), 3);
     }
 
     @Test

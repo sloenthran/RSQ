@@ -198,6 +198,27 @@ public class VisitControllerTest {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void changeVisitTimeException() throws Exception {
+        //Given
+        ChangeVisitTimeDto visitTimeDto = ChangeVisitTimeDto.builder()
+                .id(1L)
+                .date(LocalDateTime.MIN)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(visitTimeDto, headers);
+
+        //When
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visit/time", HttpMethod.PUT, httpEntity, String.class);
+
+        //Then
+        assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void getVisits() {
     }
 

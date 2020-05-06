@@ -7,6 +7,7 @@ import pl.nogacz.rsq.exception.VisitNotFoundException;
 import pl.nogacz.rsq.repository.VisitRepository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 
 @Transactional
 @Service
@@ -19,7 +20,17 @@ public class VisitService {
     }
 
     public void deleteVisit(final Long id) throws VisitNotFoundException {
-        Visit visit = visitRepository.findById(id).orElseThrow(VisitNotFoundException::new);
+        Visit visit = getVisit(id);
         visitRepository.delete(visit);
+    }
+
+    public Visit getVisit(final Long id) throws VisitNotFoundException {
+        return visitRepository.findById(id).orElseThrow(VisitNotFoundException::new);
+    }
+
+    public Visit changeVisitTime(final Long id, final LocalDateTime date) throws VisitNotFoundException {
+        Visit visit = getVisit(id);
+        visit.setDate(date);
+        return visitRepository.save(visit);
     }
 }

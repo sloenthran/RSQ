@@ -41,8 +41,9 @@ public class VisitController {
     }
 
     @PutMapping("/visit/time")
-    public VisitDto changeVisitTime(@RequestBody ChangeVisitTimeDto visitTimeDto) {
-        return null;
+    public VisitDto changeVisitTime(@RequestBody ChangeVisitTimeDto visitTimeDto) throws VisitNotFoundException {
+        Visit visit = service.changeVisitTime(visitTimeDto.getId(), visitTimeDto.getDate());
+        return mapper.mapVisitToVisitDto(visit);
     }
 
     @GetMapping("/visits")

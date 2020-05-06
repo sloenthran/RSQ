@@ -8,6 +8,7 @@ import pl.nogacz.rsq.repository.VisitRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Transactional
 @Service
@@ -32,5 +33,9 @@ public class VisitService {
         Visit visit = getVisit(id);
         visit.setDate(date);
         return visitRepository.save(visit);
+    }
+
+    public List<Visit> getVisits() {
+        return visitRepository.findAll();
     }
 }

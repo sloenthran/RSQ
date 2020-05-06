@@ -48,7 +48,9 @@ public class VisitController {
 
     @GetMapping("/visits")
     public List<VisitDto> getVisits() {
-        return null;
+        return mapper.mapListVisitToListVisitDto(
+                service.getVisits()
+        );
     }
 
     @GetMapping("/visits/{id}")

@@ -10,6 +10,9 @@ import pl.nogacz.rsq.exception.PatientNotFoundException;
 import pl.nogacz.rsq.service.DoctorService;
 import pl.nogacz.rsq.service.PatientService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @AllArgsConstructor
 public class VisitMapper {
@@ -37,5 +40,11 @@ public class VisitMapper {
                 .place(visit.getPlace())
                 .date(visit.getDate())
                 .build();
+    }
+
+    public List<VisitDto> mapListVisitToListVisitDto(final List<Visit> visits) {
+        return visits.stream()
+                .map(this::mapVisitToVisitDto)
+                .collect(Collectors.toList());
     }
 }

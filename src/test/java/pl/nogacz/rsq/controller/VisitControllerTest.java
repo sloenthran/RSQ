@@ -13,6 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.nogacz.rsq.domain.*;
 import pl.nogacz.rsq.dto.AddVisitDto;
+import pl.nogacz.rsq.dto.ChangeVisitTimeDto;
 import pl.nogacz.rsq.dto.VisitDto;
 import pl.nogacz.rsq.repository.DoctorRepository;
 import pl.nogacz.rsq.repository.PatientRepository;
@@ -137,7 +138,6 @@ public class VisitControllerTest {
         HttpEntity httpEntity = new HttpEntity(headers);
 
         //When
-
         ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visit/1", HttpMethod.DELETE, httpEntity, String.class);
 
         //Then
@@ -146,7 +146,54 @@ public class VisitControllerTest {
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-    public void changeVisitTime() {
+    public void changeVisitTime() throws Exception {
+        //Given
+        Doctor doctor = Doctor.builder()
+                .name("Alfred")
+                .surname("Dratewka")
+                .specialization(DoctorSpecialization.PSYCHOLOGIST)
+                .build();
+
+        Patient patient = Patient.builder()
+                .name("Radosław")
+                .surname("Koparka")
+                .address("Budowlana 1, 00-000 Zakopane")
+                .build();
+
+        Visit visit = Visit.builder()
+                .doctor(doctor)
+                .patient(patient)
+                .place(VisitPlace.INSTITUTION)
+                .date(LocalDateTime.now())
+                .build();
+
+        doctor.getVisits().add(visit);
+        patient.getVisits().add(visit);
+
+        ChangeVisitTimeDto visitTimeDto = ChangeVisitTimeDto.builder()
+                .id(1L)
+                .date(LocalDateTime.MIN)
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity httpEntity = new HttpEntity(visitTimeDto, headers);
+
+        //When
+        doctorRepository.save(doctor);
+        patientRepository.save(patient);
+        visitRepository.save(visit);
+
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.serverPort + "/visit/time", HttpMethod.PUT, httpEntity, String.class);
+        VisitDto responseDto = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(responseEntity.getBody(), VisitDto.class);
+
+        //Then
+        assertEquals(responseDto.getId(), 1L, 0.0);
+        assertEquals(responseDto.getDoctor(), 1L, 0.0);
+        assertEquals(responseDto.getPatient(), 1L, 0.0);
+        assertEquals(responseDto.getDate(), LocalDateTime.MIN);
+        assertEquals(responseDto.getPlace(), VisitPlace.INSTITUTION);
     }
 
     @Test
